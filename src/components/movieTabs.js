@@ -11,6 +11,15 @@ class MovieTabs extends React.Component {
     //this.deleteMovie = this.deleteMovie.bind(this);
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    console.log(nextProps, nextState, this.props.sortBy);
+    if (nextProps.sortBy !== this.props.sortBy) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   handleClick = value => {
     const { updateSortBy } = this.props;
     return () => {
@@ -20,7 +29,7 @@ class MovieTabs extends React.Component {
 
   getClassLink = value => {
     const { sortBy } = this.props;
-    return sortBy === value ? "active" : "badge-secondary";
+    return sortBy === value ? "btn-primary" : "btn-secondary";
   };
 
   render() {
@@ -28,9 +37,9 @@ class MovieTabs extends React.Component {
     return (
       <div>
         <ul className="tabs nav nav-pills">
-          <li className="nav-link">
+          <li className="pl-0 nav-link">
             <div
-              className={`btn nav-link ${this.getClassLink("popularity.desc")}`}
+              className={`btn ${this.getClassLink("popularity.desc")}`}
               onClick={this.handleClick("popularity.desc")}
             >
               Popylarity{console.log(sortBy)}
@@ -38,7 +47,7 @@ class MovieTabs extends React.Component {
           </li>
           <li className="nav-link">
             <div
-              className={`btn nav-link ${this.getClassLink("revenue.desc")}`}
+              className={`btn  ${this.getClassLink("revenue.desc")}`}
               onClick={this.handleClick("revenue.desc")}
             >
               Revenue
@@ -46,9 +55,7 @@ class MovieTabs extends React.Component {
           </li>
           <li className="nav-link">
             <div
-              className={`btn nav-link ${this.getClassLink(
-                "vote_average.desc"
-              )}`}
+              className={`btn ${this.getClassLink("vote_average.desc")}`}
               onClick={this.handleClick("vote_average.desc")}
             >
               Vote avetage

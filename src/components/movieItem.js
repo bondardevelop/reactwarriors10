@@ -1,4 +1,6 @@
 import React from "react";
+import defaultPoster from "../img/default_bg.jpg";
+const classNames = require("classnames");
 
 class MovieItem extends React.Component {
   constructor() {
@@ -17,6 +19,16 @@ class MovieItem extends React.Component {
     });
   };
 
+  miviePosterPath = () => {
+    const { movie } = this.props;
+    if (movie.backdrop_path !== null && movie.poster_path !== null) {
+      return `https://image.tmdb.org/t/p/w500${movie.backdrop_path ||
+        movie.poster_path}`;
+    } else {
+      return defaultPoster;
+    }
+  };
+
   render() {
     const {
       movie,
@@ -24,23 +36,28 @@ class MovieItem extends React.Component {
       addTowillWatch,
       removeFromwillWatch
     } = this.props;
+    const willWatchbtnClass = classNames({
+      btn: true,
+      "btn-primary": this.state.willWatch,
+      "btn btn-success": !this.state.willWatch
+    });
     return (
       <div className="card">
         <img
           className="card-img"
-          src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path ||
-            movie.poster_path}`}
+          src={this.miviePosterPath()}
           alt={movie.title}
         />
+
         <div className="p-2">
           <h6>{movie.title}</h6>
-          <div className="align-items-center d-flex justify-content-between mb-4">
-            <p className="m-0">{`Rating ${movie.vote_average}`}</p>
 
+          <div className="align-items-center d-flex justify-content-between mb-4">
+            <p className="m-0">{`Rating ${movie.vote_average} `}</p>
             <button
-              className={
-                this.state.willWatch ? "btn btn-primary" : "btn btn-success"
-              }
+              className={`${willWatchbtnClass} ${
+                this.state.willWatch ? "test" : "test2"
+              }`}
               onClick={() => {
                 this.buttonWillWatchHandle();
                 this.state.willWatch
@@ -51,6 +68,7 @@ class MovieItem extends React.Component {
               {this.state.willWatch ? "Not watch" : "Will Watch"}
             </button>
           </div>
+
           <div className="d-flex">
             <button
               className="btn btn-secondary"

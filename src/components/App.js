@@ -1,6 +1,7 @@
 import React from "react";
 import MovieItem from "./movieItem";
 import MovieTabs from "./movieTabs";
+import MoviePagination from "./moviePagination";
 import { API_URL, API_KEY } from "../api/api";
 
 class App extends React.Component {
@@ -11,27 +12,42 @@ class App extends React.Component {
     this.state = {
       movies: [],
       moviesToWatch: [],
-      sort_by: "popularity.desc"
+      sort_by: "popularity.desc",
+      current_page: 1,
+      total_pages: 1
     };
-
-    //this.deleteMovie = this.deleteMovie.bind(this);
   }
 
   componentDidMount() {
     console.log("componentDidMount");
+    this.getMovies();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    console.log("componentDidUpdate", prevProps, prevState);
+    console.log("this", prevState.current_page, this.state.current_page);
+    if (prevState.sort_by !== this.state.sort_by) {
+      console.log("callAPI");
+      this.getMovies();
+    }
+  }
+
+  getMovies = () => {
+    console.log("callApi");
     fetch(
-      `${API_URL}/discover/movie?api_key=${API_KEY}&sort_by=${this.state.sort_by}`
+      `${API_URL}/discover/movie?api_key=${API_KEY}&sort_by=${this.state.sort_by}&page=${this.state.current_page}`
     )
       .then(response => {
         return response.json();
       })
       .then(data => {
-        console.log("fetch", data);
         this.setState({
-          movies: data.results
+          movies: data.results,
+          current_page: data.page,
+          total_pages: data.total_pages
         });
       });
-  }
+  };
 
   updateSortBy = value => {
     this.setState({
@@ -46,6 +62,21 @@ class App extends React.Component {
     this.setState({
       movies: updateMovies
     });
+  };
+
+  nextPage = () => {
+    this.setState({
+      current_page: (this.state.current_page += 1)
+    });
+    this.getMovies();
+  };
+
+  prevPage = () => {
+    this.setState({
+      current_page:
+        this.state.current_page !== 1 ? (this.state.current_page -= 1) : null
+    });
+    this.getMovies();
   };
 
   addTowillWatch = movie => {
@@ -65,8 +96,16 @@ class App extends React.Component {
     });
   };
 
+  showPageItems = page => {
+    console.log(page, this.state.current_page !== 1);
+    this.setState({
+      current_page: page
+    });
+    console.log(page, this.state.current_page);
+    this.getMovies();
+  };
+
   render() {
-    console.log("render");
     return (
       <div className="container">
         <div className="row">
@@ -76,6 +115,13 @@ class App extends React.Component {
                 <MovieTabs
                   sortBy={this.state.sort_by}
                   updateSortBy={this.updateSortBy}
+                />
+              </div>
+              <div className="col-12 mb-4">
+                <MoviePagination
+                  currentPage={this.state.current_page}
+                  allPages={this.state.total_pages}
+                  showPageItems={this.showPageItems}
                 />
               </div>
             </div>
@@ -95,7 +141,22 @@ class App extends React.Component {
             </div>
           </div>
           <div className="col-3">
-            Movie to watch {this.state.moviesToWatch.length}
+            <div className="row">
+              <div className="col-12">
+                Movie to watch {this.state.moviesToWatch.length}
+              </div>
+              <div className="col-12">page {this.state.current_page}</div>
+              <div className="mt-4 col-12">
+                <div className="d-flex justify-content-between">
+                  <div className="btn btn-success" onClick={this.prevPage}>
+                    prev page
+                  </div>
+                  <div className="btn btn-success" onClick={this.nextPage}>
+                    next page
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
